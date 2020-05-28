@@ -70,98 +70,90 @@ public class MemberService {
 	}
 
 	public MemberData selectAllMemberPage(int reqPage) {
-		// 한 페이지당 게시물수 numPerPage->개발자 지정
-		// 총 게시물수 totalCount->DB 조회
+		//한 페이지당 게시물 수 numPerPage - 개발자 지정 
+		//총 게시물 수  - totalCount - db조회
+		//해당 페이지의 게시물 시작번호, 끝번호 - start, end -> totalPage, reqPage로 계산
+		//페이징 길이 pageNaviSize - 개발자 지정
+		
 		SqlSession session = SqlSessionTemplate.getSqlSession();
-		// 해당 페이지 게시물 시작 번호,끝번호 Start/End -> totalPage,reqPage 로 계산
-		int totalCount = new MemberDao().totalCount(session);
-		// 페이징 길이 PageNaviSize->개발자 지정
-		System.out.println("totalCount:" + totalCount);
-
-		// 한 페이지당 게시물 수
-		int numPerPage = 5;
-		// 총 페이지 수
+		int totalCount = new MemberDao().totalCount(session); //총 게시물 수
+		System.out.println("totalCount : " + totalCount);
+		
+		int numPerPage = 5; //한 페이지당 게시물 수
+		
+		//총 페이지 수 구하는 연산
 		int totalPage = 0;
-		// 토타 카운트가 2개
-
-		// 나머지가 생기면 한페이지 더 줘야 하니깐 +1 ~!
-		if (totalCount % numPerPage == 0) {
-			totalPage = totalCount / numPerPage;
-		} else {
-			totalPage = totalCount / numPerPage + 1;
+		if(totalCount%numPerPage == 0) { //총 게시물 수/한 페이지당 게시물 수가 딱 맞아 떨어지면
+			totalPage = totalCount/numPerPage; //그 몫을 페이지 길이
+		}else {
+			totalPage = totalCount/numPerPage+1; //그 몫에 +1한
 		}
-		// 조회해올 게시물 시작번호
-		int start = (reqPage - 1) * numPerPage + 1;
+		
+		//조회해올 게시물 시작번호와 끝번호 조회
+		int start = (reqPage-1)*numPerPage+1;//요청페이지번호-1 *한 페이지당 게시물 수+1
 		int end = reqPage * numPerPage;
-		/*
-		 * 1.페이지 게시물 5 1페이지 rnum 1~5 까지 필요하고 2페이지 rnum 6~10
-		 * 
-		 * 1페이지
-		 */
-
-		HashMap<String, Integer> map = new HashMap<String, Integer>();
+		
+		HashMap<String,Integer> map = new HashMap<String, Integer>();
 		map.put("start", start);
 		map.put("end", end);
-
 		List list = new MemberDao().selectAllMemberPage(session, map);
-		// 페이지 네비 게이션 작성 시작
+		
+		//페이지 네비게이션 작성
 		String pageNavi = "";
-		// 페이지 네비 길이
+		//페이지 네비 길이 ( < 1 2 3 > 처럼 )
 		int pageNaviSize = 3;
-		// v페이지 네비 시작번호 연산
-		// 1~3 페이지 요청 1로 시작 , 4~6 페이지 요청시 4로 시작...
-		int pageNo = ((reqPage - 1) / pageNaviSize) * pageNaviSize + 1;
-		// 페이지 네비는 [이전] [페이지 번호][다음] 순서로 작성
-		if (pageNo != 1) {
-			pageNavi += "<a href='/allMemberPage?reqPage=" + (pageNo - 1) + "'>[이전]</a>";
-
+		//페이지 네비 시작번호 연산 1~3페이지 요청 시 1로 시작, 4~6페이지 요청 시 4로 시작 ( < 4 5 6 > 처럼)
+		int pageNo = (reqPage-1)/pageNaviSize+1;
+		// 페이지 네비는 < [페이지 번호] > 순서로 작성
+		if(pageNo != 1) { //이전 버튼 생성
+			pageNavi += "<a href='/allMemberPage?reqPage="+(pageNo-1)+"' >[이전]</a>";
 		}
-		for (int i = 0; i < pageNaviSize; i++) {
-			if (reqPage == pageNo) {
-				pageNavi += "<span>" + pageNo + "</span>";
-
-			} else {
-				pageNavi += "<a href='/allMemberPage?reqPage=" + pageNo + "'>" + pageNo + "</a>";
+		for(int i=0; i<pageNaviSize; i++) {
+			if(reqPage == pageNo) { //선택된 페이지 일때
+				pageNavi += "<span>"+pageNo+"</span>";
+			}else {
+				pageNavi += "<a href='/allMemberPage?reqPage="+pageNo+"'>"+pageNo+"</a>";
 			}
 			pageNo++;
-			if (pageNo > totalPage) {
+			if(pageNo>totalPage) {
 				break;
 			}
 		}
-		if(pageNo<=totalPage) {
-			pageNavi +="<a href='/allMemberPage?reqPage=?"+pageNo+"'>[다음]</a>";
+		if(pageNo <= totalPage) {
+			pageNavi += "<a href='/allMemberPage?reqPage="+pageNo+"'>다음</a>";
 		}
-		MemberData md = new MemberData((ArrayList<Member>)list,pageNavi);
+		
+		MemberData md = new MemberData((ArrayList<Member>)list, pageNavi);
 		session.close();
 		return md;
+	
 	}
-
 	public ArrayList<Member> memberInfo(Check ck) {
 		SqlSession session = SqlSessionTemplate.getSqlSession();
-		List list = new MemberDao().memberInfo(session,ck);
+		List list = new MemberDao().memberInfo(session, ck);
 		session.close();
-		return (ArrayList<Member>)list;
+		return (ArrayList<Member>) list;
 	}
 
 	public ArrayList<Member> search(Search search) {
 		SqlSession session = SqlSessionTemplate.getSqlSession();
-		List list = new MemberDao().search(session,search);
+		List list = new MemberDao().search(session, search);
 		session.close();
-		return (ArrayList<Member>)list;
+		return (ArrayList<Member>) list;
 	}
 
 	public ArrayList<Member> search2(Member m) {
 		SqlSession session = SqlSessionTemplate.getSqlSession();
-		List list = new MemberDao().search(session,m);
+		List list = new MemberDao().search(session, m);
 		session.close();
-		return (ArrayList<Member>)list;
+		return (ArrayList<Member>) list;
 	}
 
 	public ArrayList<Member> search(String[] memberId) {
 		SqlSession session = SqlSessionTemplate.getSqlSession();
-		List list = new MemberDao().search(session,memberId);
+		List list = new MemberDao().search(session, memberId);
 		session.close();
-		return (ArrayList<Member>)list;
+		return (ArrayList<Member>) list;
 	}
 
 }

@@ -24,8 +24,11 @@
 		<a href="/boardList?reqPage=1">게시판ㄱ ㄱ</a>
 		<br>
 		<a href="/delete">회원탈퇴</a>
+		<br>
 		<a href="/allMemberPage">전체회원조회</a>
+		<br>
 		<a href="/mypage">마이페이지</a>
+		<br>
 		<a href="/allMember">전체 회원 조회</a>
 		<br>
 		<a href="/logout">로그아웃</a>

@@ -16,44 +16,39 @@ import member.model.vo.MemberData;
 @WebServlet(name = "AllMemberPage", urlPatterns = { "/allMemberPage" })
 public class AllMemberPageServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public AllMemberPageServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
 
 	/**
-	 * @see HttpServlet#HttpServlet()
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-	public AllMemberPageServlet() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		// 1.인코딩
-		request.setCharacterEncoding("utf-8");
-		// 2.변수저장
-		int reqPage = 1;
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		//2.변수에 저장
+		int reqPage;
 		try {
-			reqPage = Integer.parseInt(request.getParameter("rePage"));
-		} catch (NumberFormatException e) {
+			reqPage = Integer.parseInt(request.getParameter("reqPage"));
+		}catch(NumberFormatException e){ //정수값이 안넘어올 때
 			reqPage = 1;
 		}
-
-		// 3.비지니스 로직
+		//3.비즈니스로직
 		MemberData md = new MemberService().selectAllMemberPage(reqPage);
+		
+		//4.결과처리
 		request.setAttribute("list", md.getList());
 		request.setAttribute("pageNavi", md.getPageNavi());
 		request.getRequestDispatcher("/WEB-INF/views/allMemberPage.jsp").forward(request, response);
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
