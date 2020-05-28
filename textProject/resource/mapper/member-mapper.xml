@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="member">
+	<select id="selectOneMember" parameterType="member"
+		resultType="member">
+		select
+		member_no as memberNo,member_id as memberId,member_Pw
+		as memberPw,
+		member_name as memberName,age,enroll_date as enrollDate
+		from member where member_id=#{memberId} and member_Pw = #{memberPw}
+	</select>
+	<insert id="insertMember" parameterType="member">
+		insert into member
+		values(member_seq.nextval,#{memberId},#{memberPw},#{memberName},#{age},sysdate)
+	</insert>
+	<select id="selectAllMember" resultType="member">
+		select
+		member_no as
+		memberNo,member_id as memberId,member_Pw as memberPw,
+		member_name as
+		memberName,age,enroll_date as enrollDate
+		from member
+	</select>
+	<update id="updateMember" parameterType="member">
+
+		update member set
+		member_pw=#{memberPw},member_name=#{memberName}
+		where
+		member_id=#{memberId}
+
+	</update>
+	<delete id="deleteMember" parameterType="String">
+		<!-- 개체가 아니라 그냥 값이 넘어오는 경우 요로코롬 씀 -->
+		delete from member where member_id=#{_parameter}
+
+	</delete>
+	<select id="totalCount" resultType="_int">
+		select count(*) as cnt from
+		member
+
+	</select>
+	<!-- 들어가는 객체 타입을 적어주는게 resultType -->
+	<select id="allMemberListPage" parameterType="map"
+		resultType="member">
+
+		select *from
+		(select rownum as rnum,n.*from
+		(select member_no as memberNo,member_id as
+		memberId,member_pw as
+		member_Pw,member_name as
+		memberName,age,enroll_date from member order
+		by member_No)n)
+		where rnum
+		between #{#start} and #{end}
+	</select>
+	<select id="memberInfo" parameterType="check"
+		resultType="member">
+		select
+		member_pw as memberPw,
+		<if test="ckId !=null and ckId.equals('on')">
+			member_id as memberId,
+		</if>
+		<if test="ckNo!=null and ckNo.equals('on')">
+			member_no as memberNo,
+		</if>
+		<if test="ckName!=null and ckName.equals('on')">
+			member_name as memberName,
+		</if>
+
+		<if test="ckAge!=null and ckAge.equals('on')">
+			age,
+		</if>
+		enroll_date as enrollDate from member order by 1
+
+
+
+	</select>
+	<select id="search" parameterType="search" resultType="member">
+		select
+		member_no as memberNo,
+		member_id as memberId,
+		member_pw as memberPw,
+		member_name as memberName,
+		age,
+		enroll_date as enrollDate
+		from member
+		<choose>
+			<when test="select.equals('name')">
+				where member_name like '%'||#{keyword}||'%'
+			</when>
+			<when test="select.equals('id')">
+				where member_id like '%'||#{keyword}||'%'
+			</when>
+		</choose>
+	</select>
+
+	<select id="search2" parameterType="member" resultType="member">
+		select
+		member_no as memberNo,
+		member_id as memberId,
+		member_pw as memberPw,
+		member_name as memberName,
+		age,
+		enroll_date as enrollDate
+		from member
+		<trim prefix="where" prefixOverrides="and||or">
+			<!-- 트림안의 구문 실행시 prefix 실행시켜라 근데 실행시 시작이 and 나 or 이면 지워 -->
+			<if test="memberName != null and memberName.equals('')">
+				member_name like '%'||#{memberName}||'%'
+			</if>
+			<if test="memberId != null and memberId.equals('')">
+				and member_id like '%'||#{memberName}||'%'
+
+			</if>
+		</trim>
+	</select>
+	<select id="search3" parameterType="map" resultType="member">
+	select
+		member_no as memberNo,
+		member_id as memberId,
+		member_pw as memberPw,
+		member_name as memberName,
+		age,
+		enroll_date as enrollDate
+	from member where member_id in
+	<foreach collection="array" item="id" open="(" separator="," close=")">
+	#{id}
+	
+	
+	</foreach>
+	
+	</select>
+</mapper>
+<!-- 쿼리문 자리 -->

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd" >
+<configuration>
+	<settings>
+
+		<setting name="jdbcTypeForNull" value="NULL" />
+	</settings>
+	<typeAliases>
+		<typeAlias type="member.model.vo.Member" alias="member" />
+		<typeAlias type="member.model.vo.Check" alias="check" />
+		<typeAlias type="member.model.vo.Search" alias="search" />
+		<typeAlias type="board.model.vo.Board" alias="board" />
+
+	</typeAliases>
+
+
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC" />
+			<dataSource type="Pooled">
+				<!-- ㅓJDBC 연결이랑 같다고 보면 됨 -->
+				<property name="driver"
+					value="oracle.jdbc.driver.OracleDriver" />
+				<property name="url"
+					value="jdbc:oracle:thin:@127.0.0.1:1521:xe" />
+				<property name="username" value="mybatis" />
+				<property name="password" value="1234" />
+			</dataSource>
+		</environment>
+	</environments>
+
+	<mappers>
+		<!-- mapper 경로 잡아주는 것 -->
+		<mapper resource="mapper/member-mapper.xml" />
+		
+		<mapper resource="mapper/board-mapper.xml" />
+	</mappers>
+
+
+
+
+
+</configuration>

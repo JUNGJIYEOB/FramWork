@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="board">
+
+	<select id="totalCount" parameterType="map" resultType="_int">
+		select count(*) as cnt from board
+		<if test="type != null">
+			<if test="type.equals('boardTitle')">
+				where board_title like '%'||#{keyword}||'%'
+			</if>
+			<if test="type.equals('boardWriter')">
+				where board_writer like '%'||#{keyword}||'%'
+			</if>
+		</if>
+	</select>
+	<select id="selectList" parameterType="map" resultType="board">
+		select * from
+		(select rownum as rnum, b.* from
+		(select
+		board_no as
+		boardNo,
+		board_title as boardTitle,
+		board_writer as boardWriter,
+		read_count as readCount,
+		reg_date as regDate
+		from board
+		<if test="type != null">
+			<if test="type.equals('boardTitle')">
+				where board_title like '%'||#{keyword}||'%'
+			</if>
+			<if test="type.equals('boardWriter')">
+				where board_writer like '%'||#{keyword}||'%'
+			</if>
+		</if>
+		order by board_no desc)b
+		)
+		where rnum between #{start} and #{end}
+	</select>
+	<insert id="insertBoard" parameterType="board">
+		insert into board values
+		(board_seq.nextval,#{boardTitle},#{boardContent},#{boardWriter},0,sysdate)
+	</insert>
+	<select id="selectOneBoard" parameterType="_int"
+		resultType="board">
+		select
+		board_no as boardNo,
+		board_title as boardTitle,
+		board_writer as boardWriter,
+		read_count as readCount,
+		reg_date as
+		regDate
+		from board where board_no=#{_parameter}
+
+	</select>
+	<update id="addCount" parameterType="_int">
+		update board set read_count = read_count+1 where board_no = #{_parameter}
+	
+	</update>
+	<update id="upadteBoard" parameterType="board">
+		update board set board_title =#{boardTitle},board_content=#{boardContent}
+		where board_no = #{boardNo}
+	
+	</update>
+	<delete id="deleteBoard" parameterType="_int">
+		delete board where board_no=${_parameter}
+	
+	</delete>
+	<delete id="deleteBoard2" parameterType="map">
+		delete from board where board_no in 
+		<foreach collection="array" item="no" open="(" separator="," close=")">
+		#{no}
+		</foreach>
+	
+	</delete>
+</mapper>
